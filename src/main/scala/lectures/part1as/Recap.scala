@@ -2,6 +2,7 @@ package lectures.part1as
 
 import java.lang
 import scala.annotation.tailrec
+import scala.util.Try
 
 object Recap extends App {
   val aCondition: Boolean = false
@@ -130,6 +131,9 @@ object Recap extends App {
   val aNoneOption = Option(null)  // None
   val aSomeOption = Option(2)   // Some(20
   println(aNoneOption + " " + aSomeOption)
+  val aSuccessTry = Try(2)    // Success(2)
+  val aFailureTry = Try(throw new RuntimeException) // Failure(java.lang.RuntimeException)
+  println(aSuccessTry + " " + aFailureTry)
 
   // pattern matching
   val x = 2
