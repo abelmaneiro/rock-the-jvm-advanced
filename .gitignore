@@ -9,7 +9,7 @@
 
 # Project files should be checked into the repository, unless a significant
 # proportion of contributors will probably not be using Sublime Text
-# *.sublime-project
+*.sublime-project
 
 # SFTP configuration file
 sftp-config.json
@@ -62,14 +62,14 @@ GitHub.sublime-settings
 # When using Gradle or Maven with auto-import, you should exclude module files,
 # since they will be recreated, and may cause churn.  Uncomment if using
 # auto-import.
-# .idea/artifacts
-# .idea/compiler.xml
-# .idea/jarRepositories.xml
-# .idea/modules.xml
-# .idea/*.iml
-# .idea/modules
-# *.iml
-# *.ipr
+ .idea/artifacts
+ .idea/compiler.xml
+ .idea/jarRepositories.xml
+ .idea/modules.xml
+ .idea/*.iml
+ .idea/modules
+ *.iml
+ *.ipr
 
 # CMake
 cmake-build-*/
