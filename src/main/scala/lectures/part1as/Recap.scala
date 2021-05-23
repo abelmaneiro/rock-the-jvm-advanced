@@ -6,7 +6,7 @@ import scala.annotation.tailrec
 object Recap extends App {
   val aCondition: Boolean = false
   // compiler infers types for us
-  val AConditionVal = if (aCondition) 42 else 65 // if expresion returning a value
+  val aConditionVal = if (aCondition) 42 else 65 // if expresion returning a value
   // instruction (imperative languages) vs expressions (functional languages)
 
   val aCodeBlock = { // is the value of the last expresion
