@@ -215,3 +215,6 @@ $RECYCLE.BIN/
 # Project exclude paths
 /project/target/
 /target/
+
+# Manuallt added
+/project/project/target/config-classes/$0743a04e3ee21f906787.cache
