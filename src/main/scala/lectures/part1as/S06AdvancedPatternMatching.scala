@@ -1,6 +1,6 @@
 package lectures.part1as
 
-object AdvancedPatternMatching extends App {
+object S06AdvancedPatternMatching extends App {
 
   /****
   2.6. Advanced Pattern Matching, Part 1

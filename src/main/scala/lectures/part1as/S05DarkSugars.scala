@@ -2,7 +2,7 @@ package lectures.part1as
 
 import scala.util.{Random, Try}
 
-object DarkSugars extends App {
+object S05DarkSugars extends App {
 
 //*** #1: methods with single param
   def singleArgMethods(arg: Int) = s"$arg little ducks..."

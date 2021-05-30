@@ -4,7 +4,7 @@ import java.lang
 import scala.annotation.tailrec
 import scala.util.Try
 
-object Recap extends App {
+object S04Recap extends App {
   val aCondition: Boolean = false
   // compiler infers types for us
   val aConditionVal = if (aCondition) 42 else 65 // if expresion returning a value
