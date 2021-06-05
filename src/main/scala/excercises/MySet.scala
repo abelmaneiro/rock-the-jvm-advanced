@@ -35,36 +35,63 @@ class MyEmptySet[A] extends MySet[A] {
   override def --(anotherSet: MySet[A]): MySet[A] = this  // [-] -- [3,4,-] = [-]
   override def &(anotherSet: MySet[A]): MySet[A] = this // [-] && [3,4,-] = [-]
 
-  override def unary_! : MySet[A] = new MyAllInclusiveSet[A]
+  override def unary_! : MySet[A] = new MyPropertyBasedSet[A](_ => true)  // ![-] = [infinite collection of A]
 }
 
-class MyAllInclusiveSet[A] extends MySet[A] {
-  override def contains(elem: A): Boolean = true  // as it contains every possible A
-  override def +(elem: A): MySet[A] = this // ditto
-  override def ++(anotherSet: MySet[A]): MySet[A] = this // ditto
+//class MyAllInclusiveSet[A] extends MySet[A] {
+//  override def contains(elem: A): Boolean = true  // as it contains every possible A
+//  override def +(elem: A): MySet[A] = this // ditto
+//  override def ++(anotherSet: MySet[A]): MySet[A] = this // ditto
+//
+//  /*
+//    naturals = new AllInclusiveSet[Int]
+//    naturals.map(x => x % 3)
+//    = [0,1,2,-]  //  infinite set returns a finite set
+//   */
+//  override def map[B](f: A => B): MySet[B] = ???
+//  override def flatMap[B](f: A => MySet[B]): MySet[B] = ???
+//
+//  override def filter(predicate: A => Boolean): MySet[A] = ???  // property based set
+//
+//  override def foreach(f: A => Unit): Unit = ???
+//
+//  override def -(elem: A): MySet[A] = ???
+//
+//  override def --(anotherSet: MySet[A]): MySet[A] = filter(!anotherSet)
+//  override def &(anotherSet: MySet[A]): MySet[A] = filter(anotherSet)
+//
+//  override def unary_! : MySet[A] = new MyEmptySet[A]  // symmetrical to MyEmptySet
+//}
 
-  /*
-    naturals = new AllInclusiveSet[Int]
-    naturals.map(x => x % 3)
-    = [0,1,2,-]  //  infinite set returns a finite set
-   */
-  override def map[B](f: A => B): MySet[B] = ???
-  override def flatMap[B](f: A => MySet[B]): MySet[B] = ???
+/*
+  All elements of type A which satisfy the property
+  { x in A | property(x) } is the mathematical canonical definition for... Element X in domain A such that property X.
+*/
+class MyPropertyBasedSet[A](property: A => Boolean) extends MySet[A] {
+  override def contains(elem: A): Boolean = property(elem)
 
-  override def filter(predicate: A => Boolean): MySet[A] = ???  // property based set
+  // { x in A | property(x) } + elem == { x in A | property(x) || x == elem }
+  //                                      x in domain A such that property X OR x equal elem
+  override def +(elem: A): MySet[A] = new MyPropertyBasedSet[A](x => property(x) || x == elem)
 
-  override def foreach(f: A => Unit): Unit = ???
+  // { x in A | property(x) } ++ anotherSet == {x in A | property(x) !! anotherSet contains x)
+  override def ++(anotherSet: MySet[A]): MySet[A] =
+    new MyPropertyBasedSet[A](x => property(x)  || anotherSet(x)) // || anotherSet.apply(x) and .apply() calls .contains()
 
-  override def -(elem: A): MySet[A] = ???
+  // allIntegers.map(_ % 3) => [0,1,2] but how do you know you havel all full finite set?
+  override def map[B](f: A => B): MySet[B] = friendlyFail
+  override def flatMap[B](f: A => MySet[B]): MySet[B] = friendlyFail
+  override def foreach(f: A => Unit): Unit = friendlyFail
 
-  override def --(anotherSet: MySet[A]): MySet[A] = filter(!anotherSet)
-  override def &(anotherSet: MySet[A]): MySet[A] = filter(anotherSet)
+  override def filter(predicate: A => Boolean): MySet[A] = new MyPropertyBasedSet[A](x => property(x) && predicate(x) )
 
-  override def unary_! : MySet[A] = new MyEmptySet[A]  // symmetrical to MyEmptySet
-}
+  override def -(elem: A): MySet[A] = filter(_ != elem) // filter(x => x != elem)
+  override def --(anotherSet: MySet[A]): MySet[A] = filter(!anotherSet)  // filter(x => !anotherSet.contains(x)
+  override def &(anotherSet: MySet[A]): MySet[A] = filter(anotherSet)   // filter(x => anotherSet.contains(x)
 
-class MyPropertyBasedSet[A](property: A => Boolean) extends MySet[A] { // all the elements of type A which satisfy the property
+  override def unary_! : MySet[A] = new MyPropertyBasedSet[A](x => !property(x))
 
+  def friendlyFail: Nothing = throw new IllegalArgumentException("Really deep rabbit hole!")
 }
 
 class MyNonEmptySet[A](head: A, tail: MySet[A]) extends MySet[A]{
@@ -136,7 +163,7 @@ class MyNonEmptySet[A](head: A, tail: MySet[A]) extends MySet[A]{
   override def &(anotherSet: MySet[A]): MySet[A] =
     filter(anotherSet)  // filer(x => anotherSet.apply(x)) Note: apply() calls contain()
 
-  override def unary_! : MySet[A] = ???
+  override def unary_! : MySet[A] = new MyPropertyBasedSet[A](x => !contains(x))
 }
 
 
@@ -165,4 +192,11 @@ object MySetPlayground extends App {
   s + 5 ++ MySet(-1, -3) + 3 map (_ * 10) foreach println  // 50 40 30 20 10 -30 -10
   s + 5 ++ MySet(-1, -3) + 3 flatMap(x => MySet(x, x * 100)) foreach println // -100 -1 -300 -3 100 1 200 2 300 3 400 4 500 5
   s + 5 ++ MySet(-1, -3) + 3 flatMap(x => MySet(x, x * 10)) filter(_ % 2 == 0) foreach println // -10 -30 10 20 2 30 40 4 50
+
+  val negativeS = !s // s.unary_! which is all the natural numbers not equal to 1,2,3,4
+  println(s"negativeS 2 & 5 = ${negativeS(2)} ${negativeS(5)}")  // Output: false & true
+  val negSEven = negativeS.filter(_ % 2 == 0)  // all natural even numbers except for 2,4
+  println(s"negSEven 4 & 5 & 6 ${negSEven(4)} & ${negSEven(5)} & ${negSEven(6)}") // false & false & true
+  val negSEvMix = negSEven + 5 ++ MySet(8, 9) - 6
+  println(s"negsEvenMixed 5 & 9 & 6 ${negSEvMix(5)} & ${negSEvMix(9)} & ${negSEvMix(6)}") // true & true & false
 }
